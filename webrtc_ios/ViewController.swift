@@ -59,20 +59,13 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
             localStream.addVideoTrack(videoTrack)
             
         }
-        
-        pc!.addStream(localStream)
-        
-        
-        let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")], optionalConstraints: [])
-        pc!.createOfferWithDelegate(self, constraints: constraints)
-        
+
         let frame = view.frame
         let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
         localStream.videoTracks[0].addRenderer(renderView);
         view.addSubview(renderView)
-        
-        pc!.addStream(localStream)
 
+        pc!.addStream(localStream)
     }
     
     
@@ -95,6 +88,9 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
     // Triggered when renegotiation is needed, for example the ICE has restarted.
     @objc func peerConnectionOnRenegotiationNeeded(peerConnection: RTCPeerConnection) {
         NSLog("peerConnectionOnRenegotiationNeeded")
+        
+        let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")], optionalConstraints: [])
+        pc!.createOfferWithDelegate(self, constraints: constraints)
     }
     
     // Called any time the ICEConnectionState changes.
