@@ -66,8 +66,8 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
         let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")], optionalConstraints: [])
         pc!.createOfferWithDelegate(self, constraints: constraints)
         
-        
-        let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, 400, 300))
+        let frame = view.frame
+        let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
         localStream.videoTracks[0].addRenderer(renderView);
         view.addSubview(renderView)
         
@@ -119,7 +119,6 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
     {
         NSLog("didOpenDataChannel")
     }
-    
     
     // RTCSessionDescriptionDelegate Protocol:
     @objc func peerConnection(peerConnection: RTCPeerConnection, didCreateSessionDescription: RTCSessionDescription, error: NSError) {
