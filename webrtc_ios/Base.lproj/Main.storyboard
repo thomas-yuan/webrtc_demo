@@ -18,27 +18,52 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello WebRTC!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWP-wK-2NP">
-                                <rect key="frame" x="242" y="289" width="116" height="21"/>
+                                <rect key="frame" x="242" y="112" width="116" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1nH-Fp-0w2">
-                                <rect key="frame" x="271" y="326" width="59" height="30"/>
+                                <rect key="frame" x="271" y="179" width="59" height="30"/>
                                 <state key="normal" title="Connect"/>
                                 <connections>
                                     <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GFR-AR-ocT"/>
                                 </connections>
                             </button>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4Zh-tx-oCA">
+                                <rect key="frame" x="242" y="141" width="116" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="IGW-jc-s65"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="gWP-wK-2NP" secondAttribute="centerX" id="VYs-LM-atP"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="eAL-y3-M3i"/>
+                            <constraint firstItem="4Zh-tx-oCA" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="8" symbolic="YES" id="7mh-zJ-F5G"/>
+                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="4Zh-tx-oCA" secondAttribute="bottom" constant="8" symbolic="YES" id="EzI-re-we6"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="trailing" secondItem="4Zh-tx-oCA" secondAttribute="trailing" id="GtW-dw-nOH"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="187" id="LBI-J5-RkD"/>
+                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="4Zh-tx-oCA" secondAttribute="centerX" id="Rx7-Gh-SmF"/>
+                            <constraint firstItem="4Zh-tx-oCA" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="8" symbolic="YES" id="YPz-YH-NuH"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="92" id="a1B-gB-gog"/>
+                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="bs1-9D-d3F"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="1nH-Fp-0w2" secondAttribute="bottom" constant="391" id="dAM-Qv-qVP"/>
+                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="4Zh-tx-oCA" secondAttribute="bottom" constant="8" symbolic="YES" id="hnQ-IS-Fwg"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="leading" secondItem="4Zh-tx-oCA" secondAttribute="leading" id="lfn-zP-ste"/>
                             <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="16" id="vqo-Jf-6WE"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="LBI-J5-RkD"/>
+                                <exclude reference="YPz-YH-NuH"/>
+                                <exclude reference="EzI-re-we6"/>
+                                <exclude reference="vqo-Jf-6WE"/>
+                                <exclude reference="dAM-Qv-qVP"/>
+                            </mask>
+                        </variation>
                     </view>
+                    <connections>
+                        <outlet property="inputBox" destination="4Zh-tx-oCA" id="u8d-1q-683"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

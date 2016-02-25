@@ -13,6 +13,7 @@
 		E9BF6C9A1C7F673600F786EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C981C7F673600F786EA /* Main.storyboard */; };
 		E9BF6C9C1C7F673600F786EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C9B1C7F673600F786EA /* Assets.xcassets */; };
 		E9BF6C9F1C7F673600F786EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C9D1C7F673600F786EA /* LaunchScreen.storyboard */; };
+		E9C274241C7FB4BF0085DED3 /* Signaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C274231C7FB4BF0085DED3 /* Signaling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		E9BF6C9B1C7F673600F786EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E9BF6C9E1C7F673600F786EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E9BF6CA01C7F673600F786EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E9C274231C7FB4BF0085DED3 /* Signaling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Signaling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				E9BF6C9D1C7F673600F786EA /* LaunchScreen.storyboard */,
 				E9BF6CA01C7F673600F786EA /* Info.plist */,
 				E96974051C7F7E230072E905 /* webrtc_ios-Bridging-Header.h */,
+				E9C274231C7FB4BF0085DED3 /* Signaling.swift */,
 			);
 			path = webrtc_ios;
 			sourceTree = "<group>";
@@ -213,6 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9C274241C7FB4BF0085DED3 /* Signaling.swift in Sources */,
 				E9BF6C971C7F673600F786EA /* ViewController.swift in Sources */,
 				E9BF6C951C7F673600F786EA /* AppDelegate.swift in Sources */,
 			);
