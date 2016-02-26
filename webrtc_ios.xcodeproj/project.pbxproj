@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		E0545582AF89DBB70AE31779 /* libPods-webrtc_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D871070FA9AFD12AE2B03564 /* libPods-webrtc_ios.a */; };
+		E97E0D2C1C80A5BE00320329 /* SignalingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97E0D2B1C80A5BE00320329 /* SignalingService.swift */; };
 		E9BF6C951C7F673600F786EA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BF6C941C7F673600F786EA /* AppDelegate.swift */; };
 		E9BF6C971C7F673600F786EA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BF6C961C7F673600F786EA /* ViewController.swift */; };
 		E9BF6C9A1C7F673600F786EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C981C7F673600F786EA /* Main.storyboard */; };
 		E9BF6C9C1C7F673600F786EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C9B1C7F673600F786EA /* Assets.xcassets */; };
 		E9BF6C9F1C7F673600F786EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9BF6C9D1C7F673600F786EA /* LaunchScreen.storyboard */; };
-		E9C274241C7FB4BF0085DED3 /* Signaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C274231C7FB4BF0085DED3 /* Signaling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +21,7 @@
 		91259CDCE17F667822A1516F /* Pods-webrtc_ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-webrtc_ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-webrtc_ios/Pods-webrtc_ios.release.xcconfig"; sourceTree = "<group>"; };
 		D871070FA9AFD12AE2B03564 /* libPods-webrtc_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-webrtc_ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96974051C7F7E230072E905 /* webrtc_ios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "webrtc_ios-Bridging-Header.h"; sourceTree = "<group>"; };
+		E97E0D2B1C80A5BE00320329 /* SignalingService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalingService.swift; sourceTree = "<group>"; };
 		E9BF6C911C7F673600F786EA /* webrtc_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = webrtc_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9BF6C941C7F673600F786EA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E9BF6C961C7F673600F786EA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -28,7 +29,6 @@
 		E9BF6C9B1C7F673600F786EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E9BF6C9E1C7F673600F786EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E9BF6CA01C7F673600F786EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E9C274231C7FB4BF0085DED3 /* Signaling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Signaling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +81,7 @@
 		E9BF6C931C7F673600F786EA /* webrtc_ios */ = {
 			isa = PBXGroup;
 			children = (
+				E97E0D2B1C80A5BE00320329 /* SignalingService.swift */,
 				E9BF6C941C7F673600F786EA /* AppDelegate.swift */,
 				E9BF6C961C7F673600F786EA /* ViewController.swift */,
 				E9BF6C981C7F673600F786EA /* Main.storyboard */,
@@ -88,7 +89,6 @@
 				E9BF6C9D1C7F673600F786EA /* LaunchScreen.storyboard */,
 				E9BF6CA01C7F673600F786EA /* Info.plist */,
 				E96974051C7F7E230072E905 /* webrtc_ios-Bridging-Header.h */,
-				E9C274231C7FB4BF0085DED3 /* Signaling.swift */,
 			);
 			path = webrtc_ios;
 			sourceTree = "<group>";
@@ -216,7 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9C274241C7FB4BF0085DED3 /* Signaling.swift in Sources */,
+				E97E0D2C1C80A5BE00320329 /* SignalingService.swift in Sources */,
 				E9BF6C971C7F673600F786EA /* ViewController.swift in Sources */,
 				E9BF6C951C7F673600F786EA /* AppDelegate.swift in Sources */,
 			);

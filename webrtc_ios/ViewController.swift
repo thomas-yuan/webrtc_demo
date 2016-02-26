@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 
-class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDescriptionDelegate {
+class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,9 +85,11 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
 
         pc!.addStream(localStream)
     }
+}
+
+// RTCPeerConnectionDelegate Protocol
+extension ViewController: RTCPeerConnectionDelegate {
     
-    
-    // RTCPeerConnectionDelegate Protocol
     // Triggered when the SignalingState changed.
     @objc func peerConnection(peerConnection: RTCPeerConnection, signalingStateChanged: RTCSignalingState) {
         NSLog("signalingStateChanged: \(signalingStateChanged)")
@@ -133,8 +135,11 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
     {
         NSLog("didOpenDataChannel")
     }
-    
-    // RTCSessionDescriptionDelegate Protocol:
+}
+
+// RTCSessionDescriptionDelegate Protocol:
+extension ViewController: RTCSessionDescriptionDelegate {
+
     @objc func peerConnection(peerConnection: RTCPeerConnection, didCreateSessionDescription: RTCSessionDescription, error: NSError) {
         NSLog("didCreateSessionDescription")
         peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: didCreateSessionDescription)
@@ -154,5 +159,6 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
         }
     }
 }
+
 
 
