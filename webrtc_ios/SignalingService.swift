@@ -40,10 +40,11 @@ class Channel {
     }
 }
 
+protocol DiscoveryServiceDelegate {
+    func onPeerChanged(peers:[String])
+}
+
 protocol SignalingServiceDelegate {
-    
-//    func connectedDevicesChanged(manager : SignalingService, connectedDevices: [String])
-//    func colorChanged(manager : SignalingService, colorString: String)
     func onChannelChanged(channel: Channel, status: String)
     func onDataReceived(channel: Channel, data: String)
     func name() -> String
@@ -51,7 +52,7 @@ protocol SignalingServiceDelegate {
 
 class SignalingService : NSObject {
     
-    private let ServiceType = "tplgy_signaling"
+    private let ServiceType = "ts"
     private let myPeerId = MCPeerID(displayName: UIDevice.currentDevice().name)
     private let serviceAdvertiser : MCNearbyServiceAdvertiser
     private let serviceBrowser : MCNearbyServiceBrowser
@@ -60,7 +61,7 @@ class SignalingService : NSObject {
     var channels = [MCPeerID: Channel]()
     
     var delegate : SignalingServiceDelegate?
-    
+    var discovery: DiscoveryServiceDelegate?
     override init() {
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: ServiceType)
 
@@ -90,7 +91,12 @@ class SignalingService : NSObject {
         NSLog("invitePeer: \(peerID)")
         serviceBrowser.invitePeer(peerID, toSession: self.session, withContext: nil, timeout: 10)
     }
-    
+
+    func addDelegate(delegate: SignalingServiceDelegate) {
+        // FIXME. right now, it's set, not add.
+        self.delegate = delegate
+    }
+
 }
 
 extension SignalingService : MCNearbyServiceAdvertiserDelegate {
@@ -109,6 +115,13 @@ extension SignalingService : MCNearbyServiceAdvertiserDelegate {
 
 extension SignalingService : MCNearbyServiceBrowserDelegate {
     
+    func updateDiscoveryDelegate() {
+        var ps = [String]()
+        for (name, _) in peers {
+            ps.append(name)
+        }
+        self.discovery?.onPeerChanged(ps)
+    }
     
     func browser(browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
         NSLog("didNotStartBrowsingForPeers: \(error)")
@@ -117,10 +130,13 @@ extension SignalingService : MCNearbyServiceBrowserDelegate {
     func browser(browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         NSLog("foundPeer: \(peerID)")
         peers[peerID.displayName] = peerID
+        updateDiscoveryDelegate()
     }
     
     func browser(browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         NSLog("lostPeer: \(peerID)")
+        peers.removeValueForKey(peerID.displayName)
+        updateDiscoveryDelegate()
     }
     
 }

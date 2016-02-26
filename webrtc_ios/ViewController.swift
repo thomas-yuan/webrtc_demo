@@ -9,12 +9,14 @@
 import UIKit
 import AVFoundation
 
-
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        // FIXME.
+        signaling.discovery = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -24,63 +26,54 @@ class ViewController: UIViewController {
 
     var peerConnFactory: RTCPeerConnectionFactory = RTCPeerConnectionFactory()
     var pc: RTCPeerConnection?
+    var localStream: RTCMediaStream?
+    var signaling = SignalingService()
+    let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
+
+    @IBOutlet var btn1: UIButton!
+    @IBOutlet var btn2: UIButton!
+    @IBOutlet var btn3: UIButton!
+    @IBOutlet var btn4: UIButton!
     
-    @IBOutlet weak var textField: UITextField!
-    @IBAction func onReturnPressed(sender: UITextField) {
-        sender.resignFirstResponder()
-    }
-
     @IBAction func onClick(sender: UIButton) {
-        sender.resignFirstResponder()
-        if let text = textField.text {
-            if text.isEmpty {
-                let alert = UIAlertView()
-                alert.title = "Tips"
-                alert.message = "Please Enter Peer Address"
-                alert.addButtonWithTitle("OK")
-                alert.show()
-                return
-            }
-            NSLog(text)
-        }
 
-        let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
-       
+        if (sender.titleLabel?.text == "Button") {
+            NSLog("No peer to connect")
+            return
+        }
+        
+        
         pc = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:nil, delegate:self)
         
-        let localStream = self.peerConnFactory.mediaStreamWithLabel("webrtc_demo_ios_media")
         if (localStream == nil) {
-            NSLog("create local stream failed")
-        }
-        let audioTrack = self.peerConnFactory.audioTrackWithID("webrtc_demo_ios_audio")
-        if (audioTrack == nil) {
-            NSLog("No audio Track")
-        }
-        localStream.addAudioTrack(audioTrack)
-        
-        let videoDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
-        var captureDevice:AVCaptureDevice?
-        
-        for device in videoDevices{
-            let device = device as! AVCaptureDevice
-            if device.position == AVCaptureDevicePosition.Front {
-                captureDevice = device
-                break
-            }
-        }
-        
-        // Create a video track and add it to the media stream
-        if (captureDevice != nil) {
-            let capturer = RTCVideoCapturer(deviceName: captureDevice!.localizedName)
-            let videoSource = self.peerConnFactory.videoSourceWithCapturer(capturer, constraints:nil);
-            let videoTrack = self.peerConnFactory.videoTrackWithID("webrtc_demo_ios_vedio", source:videoSource)
-            localStream.addVideoTrack(videoTrack)
+            // create localstream
+            let localStream = self.peerConnFactory.mediaStreamWithLabel("webrtc_demo_ios_media")
+            let audioTrack = self.peerConnFactory.audioTrackWithID("webrtc_demo_ios_audio")
+            localStream.addAudioTrack(audioTrack)
             
+            let videoDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
+            var captureDevice:AVCaptureDevice?
+            
+            for device in videoDevices{
+                let device = device as! AVCaptureDevice
+                if device.position == AVCaptureDevicePosition.Front {
+                    captureDevice = device
+                    break
+                }
+            }
+            
+            // Create a video track and add it to the media stream
+            if (captureDevice != nil) {
+                let capturer = RTCVideoCapturer(deviceName: captureDevice!.localizedName)
+                let videoSource = self.peerConnFactory.videoSourceWithCapturer(capturer, constraints:nil);
+                let videoTrack = self.peerConnFactory.videoTrackWithID("webrtc_demo_ios_vedio", source:videoSource)
+                localStream.addVideoTrack(videoTrack)
+            }
         }
 
         let frame = view.frame
         let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
-        localStream.videoTracks[0].addRenderer(renderView);
+        localStream!.videoTracks[0].addRenderer(renderView);
         view.addSubview(renderView)
 
         pc!.addStream(localStream)
@@ -160,5 +153,39 @@ extension ViewController: RTCSessionDescriptionDelegate {
     }
 }
 
+extension ViewController: SignalingServiceDelegate {
+    
+    func onChannelChanged(channel: Channel, status: String) {
+        NSLog("onChannelChanged: \(status)")
+        
+    }
+    
+    func onDataReceived(channel: Channel, data: String) {
+        NSLog("onDataReceived: \(data)")
 
+    }
+    
+    func name() -> String {
+        return "VideoCall"
+    }
+
+}
+
+extension ViewController: DiscoveryServiceDelegate {
+    func onPeerChanged(peers: [String]) {
+        NSLog("onPeerChanged: \(peers)")
+        if (peers.count > 0) {
+            btn1.titleLabel?.text = peers[0]
+        }
+        if (peers.count > 1) {
+            btn2.titleLabel?.text = peers[1]
+        }
+        if (peers.count > 2) {
+            btn3.titleLabel?.text = peers[2]
+        }
+        if (peers.count > 3) {
+            btn4.titleLabel?.text = peers[3]
+        }
+    }
+}
 

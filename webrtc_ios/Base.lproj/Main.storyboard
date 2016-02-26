@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -17,55 +18,49 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello WebRTC!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWP-wK-2NP">
-                                <rect key="frame" x="242" y="112" width="116" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Multipeer (as signaling) + WebRTC" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWP-wK-2NP">
+                                <rect key="frame" x="10" y="20" width="265" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1nH-Fp-0w2">
-                                <rect key="frame" x="271" y="179" width="59" height="30"/>
-                                <state key="normal" title="Connect"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qfl-WO-nPW">
+                                <rect key="frame" x="10" y="40" width="61" height="30"/>
+                                <state key="normal" title="Button"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jK1-Iv-4pQ">
+                                <rect key="frame" x="73" y="40" width="61" height="30"/>
+                                <state key="normal" title="Button"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P4C-rv-0Cf">
+                                <rect key="frame" x="142" y="40" width="61" height="30"/>
+                                <state key="normal" title="Button"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L0z-0w-L5b">
+                                <rect key="frame" x="211" y="40" width="61" height="30"/>
+                                <state key="normal" title="Button"/>
                                 <connections>
-                                    <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GFR-AR-ocT"/>
+                                    <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lrs-Wg-kqx"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4Zh-tx-oCA">
-                                <rect key="frame" x="242" y="141" width="116" height="30"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
-                                <connections>
-                                    <action selector="onReturnPressed:" destination="BYZ-38-t0r" eventType="editingDidEndOnExit" id="q4v-Mq-W6M"/>
-                                </connections>
-                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="4Zh-tx-oCA" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="8" symbolic="YES" id="7mh-zJ-F5G"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="4Zh-tx-oCA" secondAttribute="bottom" constant="8" symbolic="YES" id="EzI-re-we6"/>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="trailing" secondItem="4Zh-tx-oCA" secondAttribute="trailing" id="GtW-dw-nOH"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8Wi-T0-hJU"/>
                             <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="187" id="LBI-J5-RkD"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="4Zh-tx-oCA" secondAttribute="centerX" id="Rx7-Gh-SmF"/>
-                            <constraint firstItem="4Zh-tx-oCA" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="8" symbolic="YES" id="YPz-YH-NuH"/>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="92" id="a1B-gB-gog"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="bs1-9D-d3F"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="1nH-Fp-0w2" secondAttribute="bottom" constant="391" id="dAM-Qv-qVP"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="4Zh-tx-oCA" secondAttribute="bottom" constant="8" symbolic="YES" id="hnQ-IS-Fwg"/>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="leading" secondItem="4Zh-tx-oCA" secondAttribute="leading" id="lfn-zP-ste"/>
-                            <constraint firstItem="1nH-Fp-0w2" firstAttribute="top" secondItem="gWP-wK-2NP" secondAttribute="bottom" constant="16" id="vqo-Jf-6WE"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="nHC-0X-fmJ"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="LBI-J5-RkD"/>
-                                <exclude reference="YPz-YH-NuH"/>
-                                <exclude reference="EzI-re-we6"/>
-                                <exclude reference="vqo-Jf-6WE"/>
-                                <exclude reference="dAM-Qv-qVP"/>
                             </mask>
                         </variation>
                     </view>
                     <connections>
-                        <outlet property="textField" destination="4Zh-tx-oCA" id="2kY-cO-UzW"/>
+                        <outlet property="btn1" destination="qfl-WO-nPW" id="KFf-4c-AV6"/>
+                        <outlet property="btn2" destination="jK1-Iv-4pQ" id="4KW-zG-6sC"/>
+                        <outlet property="btn3" destination="P4C-rv-0Cf" id="os8-Cb-NL4"/>
+                        <outlet property="btn4" destination="L0z-0w-L5b" id="Xy9-ue-lxG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
