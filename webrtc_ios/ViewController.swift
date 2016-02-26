@@ -25,17 +25,25 @@ class ViewController: UIViewController, RTCPeerConnectionDelegate, RTCSessionDes
     var peerConnFactory: RTCPeerConnectionFactory = RTCPeerConnectionFactory()
     var pc: RTCPeerConnection?
     
-    @IBOutlet var inputBox: UITextField!
+    @IBOutlet weak var textField: UITextField!
+    @IBAction func onReturnPressed(sender: UITextField) {
+        sender.resignFirstResponder()
+    }
+
     @IBAction func onClick(sender: UIButton) {
-        if ((inputBox.text?.isEmpty) != nil) {
-            let alert = UIAlertView()
-            alert.title = "Tips"
-            alert.message = "Please Enter Peer Address"
-            alert.addButtonWithTitle("OK")
-            alert.show()
-            return
+        sender.resignFirstResponder()
+        if let text = textField.text {
+            if text.isEmpty {
+                let alert = UIAlertView()
+                alert.title = "Tips"
+                alert.message = "Please Enter Peer Address"
+                alert.addButtonWithTitle("OK")
+                alert.show()
+                return
+            }
+            NSLog(text)
         }
-        
+
         let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
        
         pc = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:nil, delegate:self)

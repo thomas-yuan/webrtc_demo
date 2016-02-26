@@ -9,6 +9,7 @@
 import Foundation
 
 protocol SignalingObserver {
+    func onConnected()
     func onMessageReceived(channel: SignalingChannel, data: String)
 }
 
@@ -65,10 +66,10 @@ class SignalingChannel: GCDAsyncSocketDelegate {
 //    * The host parameter will be an IP address, not a DNS name.
 //    **/
 //    
-//    @objc func socket(sock: GCDAsyncSocket, didConnectToHost: NSString, port: UInt16) {
+//    @objc func socket(_: GCDAsyncSocket, didConnectToHost: NSString, port: UInt16) {
 //        
-//    }
-//    
+//     }
+//
 //    /**
 //    * Called when a socket connects and is ready for reading and writing.
 //    * The host parameter will be an IP address, not a DNS name.
