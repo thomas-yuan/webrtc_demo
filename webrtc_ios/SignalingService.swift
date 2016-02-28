@@ -13,21 +13,23 @@ import MultipeerConnectivity
 class Channel {
     var session: MCSession
     var peer: MCPeerID
+    var status: String
     
     init(session: MCSession, peer: MCPeerID) {
         self.session = session
         self.peer = peer
+        self.status = "new"
     }
     
     func sendData(data : String) -> Bool {
-        NSLog("%@", "sendData: \(data)")
+        NSLog("sendData: \(data)")
         
         if session.connectedPeers.contains(peer) {
             do {
                 try self.session.sendData(data.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, toPeers: [peer], withMode: MCSessionSendDataMode.Reliable)
                 return true
             } catch let error as NSError {
-                NSLog("%@", "\(error)")
+                NSLog("\(error)")
                 return false
             }
         } else {
@@ -87,9 +89,18 @@ class SignalingService : NSObject {
         return session
     }()
 
-    func createChannel(peerID: MCPeerID) {
-        NSLog("invitePeer: \(peerID)")
-        serviceBrowser.invitePeer(peerID, toSession: self.session, withContext: nil, timeout: 10)
+    func createChannel(peer: String) -> Channel? {
+        NSLog("createChannel to \(peer)")
+        if let p = peers[peer] {
+            let channel = Channel(session: self.session, peer: p)
+            channels[p] = channel
+            serviceBrowser.invitePeer(p, toSession: self.session, withContext: nil, timeout: 10)
+            
+            return channel
+        }
+        
+        NSLog("don't know who is \(peer)")
+        return nil
     }
 
     func addDelegate(delegate: SignalingServiceDelegate) {
@@ -148,7 +159,6 @@ extension MCSessionState {
         case .NotConnected: return "NotConnected"
         case .Connecting: return "Connecting"
         case .Connected: return "Connected"
-        default: return "Unknown"
         }
     }
     
@@ -161,9 +171,15 @@ extension SignalingService : MCSessionDelegate {
         
         switch (state) {
         case .Connected:
-            let channel = Channel(session: session, peer: peerID)
-            channels[peerID] = channel
-            self.delegate?.onChannelChanged(channel, status: "created")
+            if let channel = channels[peerID] {
+                channel.status = "created"
+                self.delegate?.onChannelChanged(channel, status: "created")
+            } else {
+                let newChannel = Channel(session: session, peer: peerID)
+                channels[peerID] = newChannel
+                newChannel.status = "received"
+                self.delegate?.onChannelChanged(newChannel, status: "received")
+            }
             return
         case .Connecting:
             return
@@ -179,13 +195,9 @@ extension SignalingService : MCSessionDelegate {
         let str = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
         
         if let channel = channels[peerID] {
-            // outbound channel?
             self.delegate?.onDataReceived(channel, data: str)
         } else {
-            let newChannel = Channel(session: session, peer: peerID)
-            channels[peerID] = newChannel
-            self.delegate?.onChannelChanged(newChannel, status: "received")
-            self.delegate?.onDataReceived(newChannel, data: str)
+            NSLog("Can't find channel!")
         }
     }
     

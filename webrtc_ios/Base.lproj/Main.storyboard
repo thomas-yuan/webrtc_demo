@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -18,37 +18,30 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Multipeer (as signaling) + WebRTC" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWP-wK-2NP">
-                                <rect key="frame" x="10" y="20" width="265" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Discovery: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWP-wK-2NP">
+                                <rect key="frame" x="20" y="20" width="85" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qfl-WO-nPW">
-                                <rect key="frame" x="10" y="40" width="61" height="30"/>
-                                <state key="normal" title="Button"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jK1-Iv-4pQ">
-                                <rect key="frame" x="73" y="40" width="61" height="30"/>
-                                <state key="normal" title="Button"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P4C-rv-0Cf">
-                                <rect key="frame" x="142" y="40" width="61" height="30"/>
-                                <state key="normal" title="Button"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L0z-0w-L5b">
-                                <rect key="frame" x="211" y="40" width="61" height="30"/>
-                                <state key="normal" title="Button"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qfl-WO-nPW">
+                                <rect key="frame" x="519" y="16" width="61" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="61" id="s2K-6Y-zKF"/>
+                                </constraints>
+                                <state key="normal" title="Talk"/>
                                 <connections>
-                                    <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lrs-Wg-kqx"/>
+                                    <action selector="onClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3wA-Dn-m14"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8Wi-T0-hJU"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="952-ID-0u3"/>
                             <constraint firstItem="gWP-wK-2NP" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="187" id="LBI-J5-RkD"/>
-                            <constraint firstItem="gWP-wK-2NP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-10" id="nHC-0X-fmJ"/>
+                            <constraint firstItem="qfl-WO-nPW" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="PYu-Zy-F7v"/>
+                            <constraint firstItem="qfl-WO-nPW" firstAttribute="baseline" secondItem="gWP-wK-2NP" secondAttribute="baseline" id="p4r-OF-rNc"/>
+                            <constraint firstItem="gWP-wK-2NP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="vZ9-sM-TWh"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
@@ -58,14 +51,12 @@
                     </view>
                     <connections>
                         <outlet property="btn1" destination="qfl-WO-nPW" id="KFf-4c-AV6"/>
-                        <outlet property="btn2" destination="jK1-Iv-4pQ" id="4KW-zG-6sC"/>
-                        <outlet property="btn3" destination="P4C-rv-0Cf" id="os8-Cb-NL4"/>
-                        <outlet property="btn4" destination="L0z-0w-L5b" id="Xy9-ue-lxG"/>
+                        <outlet property="discovery" destination="gWP-wK-2NP" id="kJO-tu-7e9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="272" y="400"/>
+            <point key="canvasLocation" x="92" y="304"/>
         </scene>
     </scenes>
 </document>
