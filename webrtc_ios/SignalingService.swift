@@ -22,8 +22,6 @@ class Channel {
     }
     
     func sendData(data : String) -> Bool {
-        NSLog("sendData: \(data)")
-        
         if session.connectedPeers.contains(peer) {
             do {
                 try self.session.sendData(data.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, toPeers: [peer], withMode: MCSessionSendDataMode.Reliable)

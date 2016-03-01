@@ -1,0 +1,13 @@
+# Xcode
+.DS_Store
+Podfile.lock
+*.pbxuser
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+webrtc_ios.xcworkspace/
+Pods
+*.ipa
+*.dSYM.zip
+*.mobileprovision
