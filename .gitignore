@@ -1,12 +1,12 @@
 # Xcode
 .DS_Store
 Podfile.lock
+webrtc_ios.xcworkspace/
 *.pbxuser
 xcuserdata/
 *.xcuserstate
 *.xccheckout
 *.xcscmblueprint
-webrtc_ios.xcworkspace/
 Pods
 *.ipa
 *.dSYM.zip
