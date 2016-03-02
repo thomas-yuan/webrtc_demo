@@ -97,9 +97,6 @@ extension ViewController: RTCPeerConnectionDelegate {
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceConnectionChanged: RTCICEConnectionState) {
         let state = toString(iceConnectionChanged)
         NSLog("iceConnectionChanged: \(state)")
-        if iceConnectionChanged == RTCICEConnectionConnected {
-            NSLog("Done")
-        }
     }
     
     // Called any time the ICEGatheringState changes.
@@ -186,9 +183,9 @@ extension ViewController: RTCSessionDescriptionDelegate {
 extension ViewController: SignalingServiceDelegate {
     func createSession(peer: String, withOffer: Bool) {
         let constraints = RTCMediaConstraints(mandatoryConstraints:
-                [RTCPair(key: "OfferToReceiveVideo", value: "true")],
+                [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
                 optionalConstraints: [])
-        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([], constraints:constraints, delegate:self)
+        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:constraints, delegate:self)
         pcs[peer] = peerConnection
 
         if (localStream == nil) {
