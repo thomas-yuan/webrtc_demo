@@ -14,13 +14,13 @@ class Channel {
     var session: MCSession
     var peer: MCPeerID
     var status: String
-    
+
     init(session: MCSession, peer: MCPeerID) {
         self.session = session
         self.peer = peer
         self.status = "new"
     }
-    
+
     func sendData(data : String) -> Bool {
         if session.connectedPeers.contains(peer) {
             do {
@@ -34,7 +34,7 @@ class Channel {
             return false
         }
     }
-    
+
     func close() {
         // FIXME.
     }
@@ -51,17 +51,15 @@ protocol SignalingServiceDelegate {
 }
 
 class SignalingService : NSObject {
-    
     private let ServiceType = "ts"
     private let myPeerId = MCPeerID(displayName: UIDevice.currentDevice().name)
     private let serviceAdvertiser : MCNearbyServiceAdvertiser
     private let serviceBrowser : MCNearbyServiceBrowser
-    
     var peers = [String: MCPeerID]()
     var channels = [MCPeerID: Channel]()
-    
     var delegate : SignalingServiceDelegate?
     var discovery: DiscoveryServiceDelegate?
+
     override init() {
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: ServiceType)
 
@@ -75,7 +73,7 @@ class SignalingService : NSObject {
         self.serviceBrowser.delegate = self
         self.serviceBrowser.startBrowsingForPeers()
     }
-    
+
     deinit {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
@@ -105,25 +103,23 @@ class SignalingService : NSObject {
         // FIXME. right now, it's set, not add.
         self.delegate = delegate
     }
-
 }
 
 extension SignalingService : MCNearbyServiceAdvertiserDelegate {
-    
+
     func advertiser(advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: NSError) {
         NSLog("didNotStartAdvertisingPeer: \(error)")
     }
-    
+
     func advertiser(advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: NSData?, invitationHandler: ((Bool, MCSession) -> Void)) {
         
         NSLog("didReceiveInvitationFromPeer \(peerID)")
         invitationHandler(true, self.session)
     }
-
 }
 
 extension SignalingService : MCNearbyServiceBrowserDelegate {
-    
+
     func updateDiscoveryDelegate() {
         var ps = [String]()
         for (name, _) in peers {
@@ -131,27 +127,26 @@ extension SignalingService : MCNearbyServiceBrowserDelegate {
         }
         self.discovery?.onPeerChanged(ps)
     }
-    
+
     func browser(browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
         NSLog("didNotStartBrowsingForPeers: \(error)")
     }
-    
+
     func browser(browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         NSLog("foundPeer: \(peerID)")
         peers[peerID.displayName] = peerID
         updateDiscoveryDelegate()
     }
-    
+
     func browser(browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         NSLog("lostPeer: \(peerID)")
         peers.removeValueForKey(peerID.displayName)
         updateDiscoveryDelegate()
     }
-    
 }
 
 extension MCSessionState {
-    
+
     func stringValue() -> String {
         switch(self) {
         case .NotConnected: return "NotConnected"
@@ -163,10 +158,10 @@ extension MCSessionState {
 }
 
 extension SignalingService : MCSessionDelegate {
-    
+
     func session(session: MCSession, peer peerID: MCPeerID, didChangeState state: MCSessionState) {
         NSLog("peer \(peerID) didChangeState: \(state.stringValue())")
-        
+
         switch (state) {
         case .Connected:
             if let channel = channels[peerID] {
@@ -187,7 +182,7 @@ extension SignalingService : MCSessionDelegate {
             return
         }
     }
-    
+
     func session(session: MCSession, didReceiveData data: NSData, fromPeer peerID: MCPeerID) {
         NSLog("didReceiveData: \(data.length) bytes")
         let str = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
@@ -198,15 +193,15 @@ extension SignalingService : MCSessionDelegate {
             NSLog("Can't find channel!")
         }
     }
-    
+
     func session(session: MCSession, didReceiveStream stream: NSInputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
         NSLog("didReceiveStream")
     }
-    
+
     func session(session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, atURL localURL: NSURL, withError error: NSError?) {
         NSLog("didFinishReceivingResourceWithName")
     }
-    
+
     func session(session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, withProgress progress: NSProgress) {
         NSLog("didStartReceivingResourceWithName")
     }
