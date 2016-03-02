@@ -86,9 +86,6 @@ extension ViewController: RTCPeerConnectionDelegate {
     // Triggered when renegotiation is needed, for example the ICE has restarted.
     @objc func peerConnectionOnRenegotiationNeeded(peerConnection: RTCPeerConnection) {
         NSLog("peerConnectionOnRenegotiationNeeded")
-        
-        let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")], optionalConstraints: [])
-        peerConnection.createOfferWithDelegate(self, constraints: constraints)
     }
     
     // Called any time the ICEConnectionState changes.
@@ -145,7 +142,8 @@ extension ViewController: RTCSessionDescriptionDelegate {
     
     @objc func peerConnection(peerConnection: RTCPeerConnection, didSetSessionDescriptionWithError: NSError)
     {
-        NSLog("didSetSessionDescriptionWithError for peer \(peerConnection),  \(didSetSessionDescriptionWithError.localizedFailureReason), signaling status: \(peerConnection.signalingState)")
+        let signalingState = toString(peerConnection.signalingState)
+        NSLog("didSetSessionDescriptionWithError for peer \(peerConnection),  \(didSetSessionDescriptionWithError.localizedFailureReason), signaling status: \(signalingState)")
         // If we have a local offer OR answer we should signal it
         if (peerConnection.signalingState == RTCSignalingHaveLocalOffer || peerConnection.signalingState == RTCSignalingHaveLocalPrAnswer) {
             // Send offer/answer through the signaling channel of our application
@@ -189,8 +187,11 @@ extension ViewController: RTCSessionDescriptionDelegate {
 }
 
 extension ViewController: SignalingServiceDelegate {
-    func createSession(peer: String) {
-        pcs[peer] = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:nil, delegate:self)
+    func createSession(peer: String, withOffer: Bool) {
+        let constraints = RTCMediaConstraints(mandatoryConstraints:
+                [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
+                optionalConstraints: [])
+        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:constraints, delegate:self)
         if (localStream == nil) {
             // create localstream
             localStream = self.peerConnFactory.mediaStreamWithLabel("webrtc_demo_ios_media")
@@ -207,7 +208,7 @@ extension ViewController: SignalingServiceDelegate {
                     break
                 }
             }
-            
+
             // Create a video track and add it to the media stream
             if (captureDevice != nil) {
                 let capturer = RTCVideoCapturer(deviceName: captureDevice!.localizedName)
@@ -215,12 +216,21 @@ extension ViewController: SignalingServiceDelegate {
                 let videoTrack = self.peerConnFactory.videoTrackWithID("webrtc_demo_ios_vedio", source:videoSource)
                 localStream!.addVideoTrack(videoTrack)
             }
-            
+
             let frame = view.frame
             let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
             localStream!.videoTracks[0].addRenderer(renderView);
             view.addSubview(renderView)
         }
+        peerConnection.addStream(localStream)
+        NSLog("Create Peer Connection and add mediastream")
+
+        if (withOffer) {
+            NSLog("Start to Create Offer...")
+            peerConnection.createOfferWithDelegate(self, constraints: constraints)
+        }
+
+        pcs[peer] = peerConnection
     }
     
     func onChannelChanged(channel: Channel, status: String) {
@@ -230,17 +240,16 @@ extension ViewController: SignalingServiceDelegate {
         case "created":
             channels[channel.peer.displayName] = channel
             dispatch_async(dispatch_get_main_queue(), {
-                NSLog("outbound channel. create session, add localstream")
-                self.createSession(channel.peer.displayName)
-                self.pcs[channel.peer.displayName]!.addStream(self.localStream)
+                NSLog("outbound channel. create session with offer")
+                self.createSession(channel.peer.displayName, withOffer: true)
             })
             break
             
         case "received":
             channels[channel.peer.displayName] = channel
             dispatch_async(dispatch_get_main_queue(), {
-                self.createSession(channel.peer.displayName)
-                NSLog("inbound channel, create session")
+                NSLog("inbound channel, create session, will create answer when receive remote offer")
+                self.createSession(channel.peer.displayName, withOffer: false)
             })
             break;
             
