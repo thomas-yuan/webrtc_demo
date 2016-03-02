@@ -33,6 +33,8 @@ class ViewController: UIViewController {
     var localStream: RTCMediaStream?
     var signaling = SignalingService()
     let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
+    var localView: RTCEAGLVideoView? = nil
+    var remoteView: RTCEAGLVideoView? = nil
 
     @IBOutlet weak var discovery: UILabel!
     @IBOutlet var btn1: UIButton!
@@ -70,14 +72,13 @@ extension ViewController: RTCPeerConnectionDelegate {
     // Triggered when media is received on a new stream from remote peer.
     @objc func peerConnection(peerConnection: RTCPeerConnection, addedStream: RTCMediaStream) {
         NSLog("addedStream")
-        dispatch_async(dispatch_get_main_queue(), {
-            let frame = self.view.frame
-            let renderView = RTCEAGLVideoView(frame:CGRectMake(0, frame.height/2, frame.width, frame.height/2))
-            addedStream.videoTracks.last!.addRenderer(renderView);
-            self.view.addSubview(renderView)
-        })
+        for track in addedStream.videoTracks {
+            NSLog("video track is: \(track)")
+        }
+
+        addedStream.videoTracks[0].addRenderer(self.remoteView);
     }
-    
+
     // Triggered when a remote peer close a stream.
     @objc func peerConnection(peerConnection: RTCPeerConnection, removedStream: RTCMediaStream) {
         NSLog("removedStream")
@@ -138,50 +139,34 @@ extension ViewController: RTCSessionDescriptionDelegate {
         dispatch_async(dispatch_get_main_queue(), {
             peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: didCreateSessionDescription)
         })
+
+        // This will be called when we create offer/answer.
+        // We need to send offer/answer here
+        for (peer, pc) in self.pcs {
+            if pc == peerConnection {
+                NSLog("send \(didCreateSessionDescription.type) to peer \(peer)")
+                if let channel = channels[peer] {
+                    channel.sendData("\(didCreateSessionDescription)")
+                } else {
+                    NSLog("Can't find channel to send sdp!")
+                }
+                break;
+            }
+        }
     }
     
     @objc func peerConnection(peerConnection: RTCPeerConnection, didSetSessionDescriptionWithError: NSError)
     {
         let signalingState = toString(peerConnection.signalingState)
         NSLog("didSetSessionDescriptionWithError for peer \(peerConnection),  \(didSetSessionDescriptionWithError.localizedFailureReason), signaling status: \(signalingState)")
-        // If we have a local offer OR answer we should signal it
-        if (peerConnection.signalingState == RTCSignalingHaveLocalOffer || peerConnection.signalingState == RTCSignalingHaveLocalPrAnswer) {
-            // Send offer/answer through the signaling channel of our application
-            if let sdp = self.sdps[peerConnection] {
-                for (peer, pc) in self.pcs {
-                    if pc == peerConnection {
-                        NSLog("send offer to peer \(peer)")
-                        if let channel = channels[peer] {
-                            channel.sendData("\(sdp)")
-                            sdps.removeValueForKey(peerConnection)
-                        } else {
-                            NSLog("Can't find channel to send sdp!")
-                        }
-                        break;
-                    }
-                }
-            }
-        } else if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer){
+ 
+        if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer){
             // If we have a remote offer we should add it to the peer connection
             NSLog("create answer")
-//            let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "AnswerToReceiveAudio", value: "true"), RTCPair(key: "AnswerToReceiveVideo", value: "true")], optionalConstraints: [])
-            peerConnection.createAnswerWithDelegate(self, constraints: nil)
-        } else {
-            NSLog("What happened here?")
-            if let sdp = self.sdps[peerConnection] {
-                for (peer, pc) in self.pcs {
-                    if pc == peerConnection {
-                        NSLog("send answer to peer \(peer)")
-                        if let channel = channels[peer] {
-                            channel.sendData("\(sdp)")
-                            sdps.removeValueForKey(peerConnection)
-                        } else {
-                            NSLog("Can't find channel to send sdp!")
-                        }
-                        break;
-                    }
-                }
-            }
+            let constraints = RTCMediaConstraints(mandatoryConstraints:
+                    [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
+                    optionalConstraints: [])
+            peerConnection.createAnswerWithDelegate(self, constraints: constraints)
         }
     }
 }
@@ -192,6 +177,8 @@ extension ViewController: SignalingServiceDelegate {
                 [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
                 optionalConstraints: [])
         let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:constraints, delegate:self)
+        pcs[peer] = peerConnection
+
         if (localStream == nil) {
             // create localstream
             localStream = self.peerConnFactory.mediaStreamWithLabel("webrtc_demo_ios_media")
@@ -218,9 +205,15 @@ extension ViewController: SignalingServiceDelegate {
             }
 
             let frame = view.frame
-            let renderView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
-            localStream!.videoTracks[0].addRenderer(renderView);
-            view.addSubview(renderView)
+            if (localView == nil) {
+                localView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width/2, frame.height/2))
+            }
+            if (remoteView == nil) {
+                remoteView = RTCEAGLVideoView(frame:CGRectMake(0, frame.height/2, frame.width, frame.height/2))
+            }
+            localStream!.videoTracks[0].addRenderer(localView)
+            view.addSubview(localView!)
+            view.addSubview(remoteView!)
         }
         peerConnection.addStream(localStream)
         NSLog("Create Peer Connection and add mediastream")
@@ -229,8 +222,6 @@ extension ViewController: SignalingServiceDelegate {
             NSLog("Start to Create Offer...")
             peerConnection.createOfferWithDelegate(self, constraints: constraints)
         }
-
-        pcs[peer] = peerConnection
     }
     
     func onChannelChanged(channel: Channel, status: String) {
@@ -263,7 +254,7 @@ extension ViewController: SignalingServiceDelegate {
     
     func onDataReceived(channel: Channel, data: String) {
         NSLog("onDataReceived: \(data)")
-        assert(pcs[channel.peer.displayName] != nil)
+//        assert(pcs[channel.peer.displayName] != nil)
         
         if channel.status == "received" {
             NSLog("first message, should be session offer")
