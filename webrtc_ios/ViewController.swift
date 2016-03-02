@@ -33,7 +33,6 @@ class ViewController: UIViewController {
     let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
     var localView: RTCEAGLVideoView? = nil
     var remoteView: RTCEAGLVideoView? = nil
-    var candidates = String()
 
     @IBOutlet weak var discovery: UILabel!
     @IBOutlet var btn1: UIButton!
@@ -69,7 +68,9 @@ extension ViewController: RTCPeerConnectionDelegate {
     @objc func peerConnection(peerConnection: RTCPeerConnection, addedStream: RTCMediaStream) {
         NSLog("addedStream \(addedStream)")
         remoteStream = addedStream
-        addedStream.videoTracks[0].addRenderer(remoteView);
+        dispatch_async(dispatch_get_main_queue(), {
+            addedStream.videoTracks[0].addRenderer(self.remoteView);
+        })
     }
 
     // Triggered when a remote peer close a stream.
@@ -92,20 +93,6 @@ extension ViewController: RTCPeerConnectionDelegate {
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceGatheringChanged: RTCICEGatheringState) {
         let state = toString(iceGatheringChanged)
         NSLog("iceGatheringChanged: \(state)")
-
-        if iceGatheringChanged == RTCICEGatheringComplete {
-            for (peer, pc) in pcs {
-                if pc == peerConnection {
-                    NSLog("send candidate to peer \(peer)")
-                    if let channel = channels[peer] {
-                        channel.sendData(candidates)
-                    } else {
-                        NSLog("Can't find channel to send candidate!")
-                    }
-                    break;
-                }
-            }
-        }
     }
 
     // New Ice candidate have been found.
@@ -115,10 +102,16 @@ extension ViewController: RTCPeerConnectionDelegate {
         NSLog("sdpMLineIndex: \(gotICECandidate.sdpMLineIndex)")
         NSLog("sdp: \(gotICECandidate.sdp)")
 
-        if candidates.isEmpty {
-            candidates = "\(gotICECandidate)"
-        } else {
-            candidates += "|\(gotICECandidate)"
+        for (peer, pc) in pcs {
+            if pc == peerConnection {
+                NSLog("send candidate to peer \(peer)")
+                if let channel = channels[peer] {
+                    channel.sendData("\(gotICECandidate)")
+                } else {
+                    NSLog("Can't find channel to send candidate!")
+                }
+                break;
+            }
         }
     }
 
@@ -272,17 +265,14 @@ extension ViewController: SignalingServiceDelegate {
                 dispatch_async(dispatch_get_main_queue(), {
                     if let s = self.pcs[channel.peer.displayName] {
                         NSLog("received condidate for \(s)")
-                        let candidates = data.componentsSeparatedByString("|")
-                        for candidate in candidates {
-                            var parts = candidate.componentsSeparatedByString(":")
-                            if parts.count == 4 {
-                                NSLog("spdMid: \(parts[0])")
-                                NSLog("sdpMLineIndex: \(parts[1])")
-                                NSLog("sdp: \(parts[2]):\(parts[3])")
-                                s.addICECandidate(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
-                            } else {
-                                NSLog("Can't convert message to candidate!!")
-                            }
+                        var parts = data.componentsSeparatedByString(":")
+                        if parts.count == 4 {
+                            NSLog("spdMid: \(parts[0])")
+                            NSLog("sdpMLineIndex: \(parts[1])")
+                            NSLog("sdp: \(parts[2]):\(parts[3])")
+                            s.addICECandidate(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
+                        } else {
+                            NSLog("Can't convert message to candidate!!")
                         }
                     }
                 })
