@@ -63,7 +63,8 @@ extension ViewController: RTCPeerConnectionDelegate {
     
     // Triggered when the SignalingState changed.
     @objc func peerConnection(peerConnection: RTCPeerConnection, signalingStateChanged: RTCSignalingState) {
-        NSLog("signalingStateChanged: \(signalingStateChanged)")
+        let state = toString(signalingStateChanged)
+        NSLog("signalingStateChanged: \(state)")
     }
     
     // Triggered when media is received on a new stream from remote peer.
@@ -92,12 +93,14 @@ extension ViewController: RTCPeerConnectionDelegate {
     
     // Called any time the ICEConnectionState changes.
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceConnectionChanged: RTCICEConnectionState) {
-        NSLog("iceConnectionChanged: \(iceConnectionChanged)")
+        let state = toString(iceConnectionChanged)
+        NSLog("iceConnectionChanged: \(state)")
     }
     
     // Called any time the ICEGatheringState changes.
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceGatheringChanged: RTCICEGatheringState) {
-        NSLog("iceGatheringChanged: \(iceGatheringChanged)")
+        let state = toString(iceGatheringChanged)
+        NSLog("iceGatheringChanged: \(state)")
     }
     
     // New Ice candidate have been found.
