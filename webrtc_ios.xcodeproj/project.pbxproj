@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0419711D1C8686D1002D8BB1 /* webrtcUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0419711C1C8686D1002D8BB1 /* webrtcUtility.swift */; };
 		E0545582AF89DBB70AE31779 /* libPods-webrtc_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D871070FA9AFD12AE2B03564 /* libPods-webrtc_ios.a */; };
 		E97E0D2C1C80A5BE00320329 /* SignalingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97E0D2B1C80A5BE00320329 /* SignalingService.swift */; };
 		E9BF6C951C7F673600F786EA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BF6C941C7F673600F786EA /* AppDelegate.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0419711C1C8686D1002D8BB1 /* webrtcUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = webrtcUtility.swift; sourceTree = "<group>"; };
 		0BB3B48AFAFE52CA93CC25BE /* Pods-webrtc_ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-webrtc_ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-webrtc_ios/Pods-webrtc_ios.debug.xcconfig"; sourceTree = "<group>"; };
 		91259CDCE17F667822A1516F /* Pods-webrtc_ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-webrtc_ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-webrtc_ios/Pods-webrtc_ios.release.xcconfig"; sourceTree = "<group>"; };
 		D871070FA9AFD12AE2B03564 /* libPods-webrtc_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-webrtc_ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,6 +86,7 @@
 				E97E0D2B1C80A5BE00320329 /* SignalingService.swift */,
 				E9BF6C941C7F673600F786EA /* AppDelegate.swift */,
 				E9BF6C961C7F673600F786EA /* ViewController.swift */,
+				0419711C1C8686D1002D8BB1 /* webrtcUtility.swift */,
 				E9BF6C981C7F673600F786EA /* Main.storyboard */,
 				E9BF6C9B1C7F673600F786EA /* Assets.xcassets */,
 				E9BF6C9D1C7F673600F786EA /* LaunchScreen.storyboard */,
@@ -128,7 +131,7 @@
 				TargetAttributes = {
 					E9BF6C901C7F673600F786EA = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = R75RUZ78CJ;
+						DevelopmentTeam = DQ356LPHQ2;
 					};
 				};
 			};
@@ -217,6 +220,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E97E0D2C1C80A5BE00320329 /* SignalingService.swift in Sources */,
+				0419711D1C8686D1002D8BB1 /* webrtcUtility.swift in Sources */,
 				E9BF6C971C7F673600F786EA /* ViewController.swift in Sources */,
 				E9BF6C951C7F673600F786EA /* AppDelegate.swift in Sources */,
 			);
