@@ -31,10 +31,12 @@ class ViewController: UIViewController {
     var pcs = [String: RTCPeerConnection]()
     var sdps = [RTCPeerConnection: RTCSessionDescription]()
     var localStream: RTCMediaStream?
+    var remoteStream: RTCMediaStream?
     var signaling = SignalingService()
     let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
     var localView: RTCEAGLVideoView? = nil
     var remoteView: RTCEAGLVideoView? = nil
+    var candidates = String()
 
     @IBOutlet weak var discovery: UILabel!
     @IBOutlet var btn1: UIButton!
@@ -75,8 +77,10 @@ extension ViewController: RTCPeerConnectionDelegate {
         for track in addedStream.videoTracks {
             NSLog("video track is: \(track)")
         }
-
-        addedStream.videoTracks[0].addRenderer(self.remoteView);
+        remoteStream = addedStream
+        dispatch_async(dispatch_get_main_queue(), {
+            addedStream.videoTracks[0].addRenderer(self.remoteView);
+        })
     }
 
     // Triggered when a remote peer close a stream.
@@ -93,12 +97,28 @@ extension ViewController: RTCPeerConnectionDelegate {
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceConnectionChanged: RTCICEConnectionState) {
         let state = toString(iceConnectionChanged)
         NSLog("iceConnectionChanged: \(state)")
+        if iceConnectionChanged == RTCICEConnectionConnected {
+            NSLog("Done")
+        }
     }
     
     // Called any time the ICEGatheringState changes.
     @objc func peerConnection(peerConnection: RTCPeerConnection, iceGatheringChanged: RTCICEGatheringState) {
         let state = toString(iceGatheringChanged)
         NSLog("iceGatheringChanged: \(state)")
+        if iceGatheringChanged == RTCICEGatheringComplete {
+            for (peer, pc) in pcs {
+                if pc == peerConnection {
+                    NSLog("send candidate to peer \(peer)")
+                    if let channel = channels[peer] {
+                        channel.sendData(candidates)
+                    } else {
+                        NSLog("Can't find channel to send candidate!")
+                    }
+                    break;
+                }
+            }
+        }
     }
     
     // New Ice candidate have been found.
@@ -108,16 +128,10 @@ extension ViewController: RTCPeerConnectionDelegate {
         NSLog("sdpMLineIndex: \(gotICECandidate.sdpMLineIndex)")
         NSLog("sdp: \(gotICECandidate.sdp)")
 
-        for (peer, pc) in pcs {
-            if pc == peerConnection {
-                NSLog("send candidate to peer \(peer)")
-                if let channel = channels[peer] {
-                    channel.sendData("\(gotICECandidate)")
-                } else {
-                    NSLog("Can't find channel to send candidate!")
-                }
-                break;
-            }
+        if candidates.isEmpty {
+            candidates = "\(gotICECandidate)"
+        } else {
+            candidates += "|\(gotICECandidate)"
         }
     }
     
@@ -163,9 +177,7 @@ extension ViewController: RTCSessionDescriptionDelegate {
         if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer){
             // If we have a remote offer we should add it to the peer connection
             NSLog("create answer")
-            let constraints = RTCMediaConstraints(mandatoryConstraints:
-                    [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
-                    optionalConstraints: [])
+            let constraints = RTCMediaConstraints()
             peerConnection.createAnswerWithDelegate(self, constraints: constraints)
         }
     }
@@ -174,15 +186,15 @@ extension ViewController: RTCSessionDescriptionDelegate {
 extension ViewController: SignalingServiceDelegate {
     func createSession(peer: String, withOffer: Bool) {
         let constraints = RTCMediaConstraints(mandatoryConstraints:
-                [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")],
+                [RTCPair(key: "OfferToReceiveVideo", value: "true")],
                 optionalConstraints: [])
-        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:constraints, delegate:self)
+        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([], constraints:constraints, delegate:self)
         pcs[peer] = peerConnection
 
         if (localStream == nil) {
             // create localstream
-            localStream = self.peerConnFactory.mediaStreamWithLabel("webrtc_demo_ios_media")
-            let audioTrack = self.peerConnFactory.audioTrackWithID("webrtc_demo_ios_audio")
+            localStream = self.peerConnFactory.mediaStreamWithLabel("media")
+            let audioTrack = self.peerConnFactory.audioTrackWithID("audio")
             localStream!.addAudioTrack(audioTrack)
             
             let videoDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
@@ -200,13 +212,13 @@ extension ViewController: SignalingServiceDelegate {
             if (captureDevice != nil) {
                 let capturer = RTCVideoCapturer(deviceName: captureDevice!.localizedName)
                 let videoSource = self.peerConnFactory.videoSourceWithCapturer(capturer, constraints:nil);
-                let videoTrack = self.peerConnFactory.videoTrackWithID("webrtc_demo_ios_vedio", source:videoSource)
+                let videoTrack = self.peerConnFactory.videoTrackWithID("vedio", source:videoSource)
                 localStream!.addVideoTrack(videoTrack)
             }
 
             let frame = view.frame
             if (localView == nil) {
-                localView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width/2, frame.height/2))
+                localView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
             }
             if (remoteView == nil) {
                 remoteView = RTCEAGLVideoView(frame:CGRectMake(0, frame.height/2, frame.width, frame.height/2))
@@ -277,15 +289,17 @@ extension ViewController: SignalingServiceDelegate {
             dispatch_async(dispatch_get_main_queue(), {
                 if let s = self.pcs[channel.peer.displayName] {
                     NSLog("received condidate for \(s)")
-                    var parts = data.componentsSeparatedByString(":")
-                    if parts.count == 4 {
-                        NSLog("spdMid: \(parts[0])")
-                        NSLog("sdpMLineIndex: \(parts[1])")
-                        NSLog("sdp: \(parts[2]):\(parts[3])")
-                        
-                        s.addICECandidate(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
-                    } else {
+                    let candidates = data.componentsSeparatedByString("|")
+                    for candidate in candidates {
+                        var parts = candidate.componentsSeparatedByString(":")
+                        if parts.count == 4 {
+                            NSLog("spdMid: \(parts[0])")
+                            NSLog("sdpMLineIndex: \(parts[1])")
+                            NSLog("sdp: \(parts[2]):\(parts[3])")
+                            s.addICECandidate(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
+                        } else {
                         NSLog("Can't convert candidate!!")
+                        }
                     }
                 }
             })
