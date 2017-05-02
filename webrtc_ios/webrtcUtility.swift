@@ -8,7 +8,7 @@
 
 import Foundation
 
-func toString(state: RTCSignalingState)->String {
+func toString(_ state: RTCSignalingState)->String {
     switch(state) {
     case RTCSignalingStable: return "RTCSignalingStable"
     case RTCSignalingHaveLocalOffer: return "RTCSignalingHaveLocalOffer"
@@ -20,7 +20,7 @@ func toString(state: RTCSignalingState)->String {
     }
 }
 
-func toString(state: RTCICEConnectionState)->String {
+func toString(_ state: RTCICEConnectionState)->String {
     switch (state) {
     case RTCICEConnectionNew: return "RTCICEConnectionNew"
     case RTCICEConnectionChecking: return "RTCICEConnectionChecking"
@@ -34,7 +34,7 @@ func toString(state: RTCICEConnectionState)->String {
     }
 }
 
-func toString(state: RTCICEGatheringState)->String {
+func toString(_ state: RTCICEGatheringState)->String {
     switch (state) {
     case RTCICEGatheringNew: return "RTCICEGatheringNew"
     case RTCICEGatheringGathering: return "RTCICEGatheringGathering"

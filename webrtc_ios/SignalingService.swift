@@ -21,10 +21,10 @@ class Channel {
         self.status = "new"
     }
 
-    func sendData(data : String) -> Bool {
+    func sendData(_ data : String) -> Bool {
         if session.connectedPeers.contains(peer) {
             do {
-                try self.session.sendData(data.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, toPeers: [peer], withMode: MCSessionSendDataMode.Reliable)
+                try self.session.send(data.data(using: String.Encoding.utf8, allowLossyConversion: false)!, toPeers: [peer], with: MCSessionSendDataMode.reliable)
                 return true
             } catch let error as NSError {
                 NSLog("\(error)")
@@ -41,20 +41,20 @@ class Channel {
 }
 
 protocol DiscoveryServiceDelegate {
-    func onPeerChanged(peers:[String])
+    func onPeerChanged(_ peers:[String])
 }
 
 protocol SignalingServiceDelegate {
-    func onChannelChanged(channel: Channel, status: String)
-    func onDataReceived(channel: Channel, data: String)
+    func onChannelChanged(_ channel: Channel, status: String)
+    func onDataReceived(_ channel: Channel, data: String)
     func name() -> String
 }
 
 class SignalingService : NSObject {
-    private let ServiceType = "ts"
-    private let myPeerId = MCPeerID(displayName: UIDevice.currentDevice().name)
-    private let serviceAdvertiser : MCNearbyServiceAdvertiser
-    private let serviceBrowser : MCNearbyServiceBrowser
+    fileprivate let ServiceType = "ts"
+    fileprivate let myPeerId = MCPeerID(displayName: UIDevice.current.name)
+    fileprivate let serviceAdvertiser : MCNearbyServiceAdvertiser
+    fileprivate let serviceBrowser : MCNearbyServiceBrowser
     var peers = [String: MCPeerID]()
     var channels = [MCPeerID: Channel]()
     var delegate : SignalingServiceDelegate?
@@ -80,17 +80,17 @@ class SignalingService : NSObject {
     }
     
     lazy var session: MCSession = {
-        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.Required)
+        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
         session.delegate = self
         return session
     }()
 
-    func createChannel(peer: String) -> Channel? {
+    func createChannel(_ peer: String) -> Channel? {
         NSLog("createChannel to \(peer)")
         if let p = peers[peer] {
             let channel = Channel(session: self.session, peer: p)
             channels[p] = channel
-            serviceBrowser.invitePeer(p, toSession: self.session, withContext: nil, timeout: 10)
+            serviceBrowser.invitePeer(p, to: self.session, withContext: nil, timeout: 10)
             
             return channel
         }
@@ -99,23 +99,26 @@ class SignalingService : NSObject {
         return nil
     }
 
-    func addDelegate(delegate: SignalingServiceDelegate) {
+    func addDelegate(_ delegate: SignalingServiceDelegate) {
         // FIXME. right now, it's set, not add.
         self.delegate = delegate
     }
 }
 
 extension SignalingService : MCNearbyServiceAdvertiserDelegate {
-
-    func advertiser(advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: NSError) {
-        NSLog("didNotStartAdvertisingPeer: \(error)")
-    }
-
-    func advertiser(advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: NSData?, invitationHandler: ((Bool, MCSession) -> Void)) {
+    @available(iOS 7.0, *)
+    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         
         NSLog("didReceiveInvitationFromPeer \(peerID)")
         invitationHandler(true, self.session)
+
     }
+
+
+    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
+        NSLog("didNotStartAdvertisingPeer: \(error)")
+    }
+
 }
 
 extension SignalingService : MCNearbyServiceBrowserDelegate {
@@ -128,19 +131,19 @@ extension SignalingService : MCNearbyServiceBrowserDelegate {
         self.discovery?.onPeerChanged(ps)
     }
 
-    func browser(browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
+    func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
         NSLog("didNotStartBrowsingForPeers: \(error)")
     }
 
-    func browser(browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
+    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         NSLog("foundPeer: \(peerID)")
         peers[peerID.displayName] = peerID
         updateDiscoveryDelegate()
     }
 
-    func browser(browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         NSLog("lostPeer: \(peerID)")
-        peers.removeValueForKey(peerID.displayName)
+        peers.removeValue(forKey: peerID.displayName)
         updateDiscoveryDelegate()
     }
 }
@@ -149,9 +152,9 @@ extension MCSessionState {
 
     func stringValue() -> String {
         switch(self) {
-        case .NotConnected: return "NotConnected"
-        case .Connecting: return "Connecting"
-        case .Connected: return "Connected"
+        case .notConnected: return "NotConnected"
+        case .connecting: return "Connecting"
+        case .connected: return "Connected"
         }
     }
     
@@ -159,11 +162,11 @@ extension MCSessionState {
 
 extension SignalingService : MCSessionDelegate {
 
-    func session(session: MCSession, peer peerID: MCPeerID, didChangeState state: MCSessionState) {
+    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("peer \(peerID) didChangeState: \(state.stringValue())")
 
         switch (state) {
-        case .Connected:
+        case .connected:
             if let channel = channels[peerID] {
                 channel.status = "created"
                 self.delegate?.onChannelChanged(channel, status: "created")
@@ -174,18 +177,18 @@ extension SignalingService : MCSessionDelegate {
                 self.delegate?.onChannelChanged(newChannel, status: "received")
             }
             return
-        case .Connecting:
+        case .connecting:
             return
-        case .NotConnected:
-            peers.removeValueForKey(peerID.displayName)
-            channels.removeValueForKey(peerID)
+        case .notConnected:
+            peers.removeValue(forKey: peerID.displayName)
+            channels.removeValue(forKey: peerID)
             return
         }
     }
 
-    func session(session: MCSession, didReceiveData data: NSData, fromPeer peerID: MCPeerID) {
-        NSLog("didReceiveData: \(data.length) bytes")
-        let str = NSString(data: data, encoding: NSUTF8StringEncoding) as! String
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        NSLog("didReceiveData: \(data.count) bytes")
+        let str = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         
         if let channel = channels[peerID] {
             self.delegate?.onDataReceived(channel, data: str)
@@ -194,15 +197,15 @@ extension SignalingService : MCSessionDelegate {
         }
     }
 
-    func session(session: MCSession, didReceiveStream stream: NSInputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
+    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
         NSLog("didReceiveStream")
     }
 
-    func session(session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, atURL localURL: NSURL, withError error: NSError?) {
+    func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL, withError error: Error?) {
         NSLog("didFinishReceivingResourceWithName")
     }
 
-    func session(session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, withProgress progress: NSProgress) {
+    func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
         NSLog("didStartReceivingResourceWithName")
     }
 }

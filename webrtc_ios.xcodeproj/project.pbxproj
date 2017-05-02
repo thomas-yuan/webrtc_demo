@@ -103,12 +103,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E9BF6CA31C7F673600F786EA /* Build configuration list for PBXNativeTarget "webrtc_ios" */;
 			buildPhases = (
-				DE825734CB7CE1B02A55EF13 /* Check Pods Manifest.lock */,
+				DE825734CB7CE1B02A55EF13 /* [CP] Check Pods Manifest.lock */,
 				E9BF6C8D1C7F673600F786EA /* Sources */,
 				E9BF6C8E1C7F673600F786EA /* Frameworks */,
 				E9BF6C8F1C7F673600F786EA /* Resources */,
-				A8C50BA49F9CE7F9E1BD0249 /* Embed Pods Frameworks */,
-				EE0529D34F34C65BAAAB9CD9 /* Copy Pods Resources */,
+				A8C50BA49F9CE7F9E1BD0249 /* [CP] Embed Pods Frameworks */,
+				EE0529D34F34C65BAAAB9CD9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -131,7 +131,8 @@
 				TargetAttributes = {
 					E9BF6C901C7F673600F786EA = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = R75RUZ78CJ;
+						DevelopmentTeam = W39MRKV5ZS;
+						LastSwiftMigration = 0830;
 					};
 				};
 			};
@@ -167,14 +168,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		A8C50BA49F9CE7F9E1BD0249 /* Embed Pods Frameworks */ = {
+		A8C50BA49F9CE7F9E1BD0249 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -182,29 +183,29 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-webrtc_ios/Pods-webrtc_ios-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DE825734CB7CE1B02A55EF13 /* Check Pods Manifest.lock */ = {
+		DE825734CB7CE1B02A55EF13 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		EE0529D34F34C65BAAAB9CD9 /* Copy Pods Resources */ = {
+		EE0529D34F34C65BAAAB9CD9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +340,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = W39MRKV5ZS;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = webrtc_ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
@@ -348,6 +350,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "webrtc_ios/webrtc_ios-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -359,6 +362,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = W39MRKV5ZS;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = webrtc_ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
@@ -367,6 +371,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "webrtc_ios/webrtc_ios-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

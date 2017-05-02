@@ -30,13 +30,13 @@ class ViewController: UIViewController {
     var localStream: RTCMediaStream?
     var remoteStream: RTCMediaStream?
     var signaling = SignalingService()
-    let iceServer = RTCICEServer(URI: NSURL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
+    let iceServer = RTCICEServer(uri: URL(string: "stun:207.107.152.149"), username: "testuser", password: "testuser321")
     var localView: RTCEAGLVideoView? = nil
     var remoteView: RTCEAGLVideoView? = nil
 
     @IBOutlet weak var discovery: UILabel!
     @IBOutlet var btn1: UIButton!
-    @IBAction func onClick(sender: UIButton) {
+    @IBAction func onClick(_ sender: UIButton) {
         if (peers.isEmpty) {
             NSLog("No peer to connect")
             return
@@ -59,44 +59,44 @@ class ViewController: UIViewController {
 extension ViewController: RTCPeerConnectionDelegate {
 
     // Triggered when the SignalingState changed.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, signalingStateChanged: RTCSignalingState) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, signalingStateChanged: RTCSignalingState) {
         let state = toString(signalingStateChanged)
         NSLog("signalingStateChanged: \(state)")
     }
 
     // Triggered when media is received on a new stream from remote peer.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, addedStream: RTCMediaStream) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, addedStream: RTCMediaStream) {
         NSLog("addedStream \(addedStream)")
         remoteStream = addedStream
-        dispatch_async(dispatch_get_main_queue(), {
-            addedStream.videoTracks[0].addRenderer(self.remoteView);
+        DispatchQueue.main.async(execute: {
+            (addedStream.videoTracks[0] as AnyObject).add(self.remoteView);
         })
     }
 
     // Triggered when a remote peer close a stream.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, removedStream: RTCMediaStream) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, removedStream: RTCMediaStream) {
         NSLog("removedStream \(removedStream)")
     }
 
     // Triggered when renegotiation is needed, for example the ICE has restarted.
-    @objc func peerConnectionOnRenegotiationNeeded(peerConnection: RTCPeerConnection) {
+    @objc func peerConnection(onRenegotiationNeeded peerConnection: RTCPeerConnection) {
         NSLog("peerConnectionOnRenegotiationNeeded \(peerConnection)")
     }
 
     // Called any time the ICEConnectionState changes.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, iceConnectionChanged: RTCICEConnectionState) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, iceConnectionChanged: RTCICEConnectionState) {
         let state = toString(iceConnectionChanged)
         NSLog("iceConnectionChanged: \(state)")
     }
 
     // Called any time the ICEGatheringState changes.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, iceGatheringChanged: RTCICEGatheringState) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, iceGatheringChanged: RTCICEGatheringState) {
         let state = toString(iceGatheringChanged)
         NSLog("iceGatheringChanged: \(state)")
     }
 
     // New Ice candidate have been found.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, gotICECandidate: RTCICECandidate) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, gotICECandidate: RTCICECandidate) {
         NSLog("gotICECandidate:")
         NSLog("spdMid: \(gotICECandidate.sdpMid)")
         NSLog("sdpMLineIndex: \(gotICECandidate.sdpMLineIndex)")
@@ -116,21 +116,22 @@ extension ViewController: RTCPeerConnectionDelegate {
     }
 
     // New data channel has been opened.
-    @objc func peerConnection(peerConnection: RTCPeerConnection, didOpenDataChannel: RTCDataChannel) {
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, didOpen didOpenDataChannel: RTCDataChannel) {
         NSLog("didOpenDataChannel")
     }
 }
 
 extension ViewController: RTCSessionDescriptionDelegate {
 
-    @objc func peerConnection(peerConnection: RTCPeerConnection, didCreateSessionDescription: RTCSessionDescription, error: NSError) {
+    // Called when creating a session.
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, didCreateSessionDescription: RTCSessionDescription, error: Error) {
         NSLog("didCreateSessionDescription for \(peerConnection)")
         NSLog("type: \(didCreateSessionDescription.type)")
         NSLog("sdp: \(didCreateSessionDescription.description)")
 
         self.sdps[peerConnection] = didCreateSessionDescription
-        dispatch_async(dispatch_get_main_queue(), {
-            peerConnection.setLocalDescriptionWithDelegate(self, sessionDescription: didCreateSessionDescription)
+        DispatchQueue.main.async(execute: {
+            peerConnection.setLocalDescriptionWith(self, sessionDescription: didCreateSessionDescription)
         })
 
         // This will be called when we create offer/answer.
@@ -147,37 +148,38 @@ extension ViewController: RTCSessionDescriptionDelegate {
             }
         }
     }
+    // Called when setting a local or remote description.
 
-    @objc func peerConnection(peerConnection: RTCPeerConnection, didSetSessionDescriptionWithError: NSError)
+    @objc func peerConnection(_ peerConnection: RTCPeerConnection, didSetSessionDescriptionWithError: Error)
     {
         let signalingState = toString(peerConnection.signalingState)
-        NSLog("didSetSessionDescriptionWithError for peer \(peerConnection), error: \(didSetSessionDescriptionWithError.localizedFailureReason), signaling status: \(signalingState)")
+//        NSLog("didSetSessionDescriptionWithError for peer \(peerConnection), error: \(didSetSessionDescriptionWithError.localizedFailureReason), signaling status: \(signalingState)")
 
         if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer){
             NSLog("create answer")
-            peerConnection.createAnswerWithDelegate(self, constraints: RTCMediaConstraints())
+            peerConnection.createAnswer(with: self, constraints: RTCMediaConstraints())
         }
     }
 }
 
 extension ViewController: SignalingServiceDelegate {
 
-    func createSession(peer: String, withOffer: Bool) {
+    func createSession(_ peer: String, withOffer: Bool) {
         let constraints = RTCMediaConstraints(mandatoryConstraints: [RTCPair(key: "OfferToReceiveAudio", value: "true"), RTCPair(key: "OfferToReceiveVideo", value: "true")], optionalConstraints: [])
-        let peerConnection = self.peerConnFactory.peerConnectionWithICEServers([iceServer], constraints:constraints, delegate:self)
+        let peerConnection = self.peerConnFactory.peerConnection(withICEServers: [iceServer!], constraints:constraints, delegate:self)
         pcs[peer] = peerConnection
 
         if (localStream == nil) {
-            localStream = self.peerConnFactory.mediaStreamWithLabel("media")
-            let audioTrack = self.peerConnFactory.audioTrackWithID("audio")
+            localStream = self.peerConnFactory.mediaStream(withLabel: "media")
+            let audioTrack = self.peerConnFactory.audioTrack(withID: "audio")
             localStream!.addAudioTrack(audioTrack)
 
-            let videoDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
+            let videoDevices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo)
             var captureDevice:AVCaptureDevice?
 
-            for device in videoDevices{
+            for device in videoDevices!{
                 let device = device as! AVCaptureDevice
-                if device.position == AVCaptureDevicePosition.Front {
+                if device.position == AVCaptureDevicePosition.front {
                     captureDevice = device
                     break
                 }
@@ -185,41 +187,41 @@ extension ViewController: SignalingServiceDelegate {
 
             if (captureDevice != nil) {
                 let capturer = RTCVideoCapturer(deviceName: captureDevice!.localizedName)
-                let videoSource = self.peerConnFactory.videoSourceWithCapturer(capturer, constraints:nil);
-                let videoTrack = self.peerConnFactory.videoTrackWithID("vedio", source:videoSource)
+                let videoSource = self.peerConnFactory.videoSource(with: capturer, constraints:nil);
+                let videoTrack = self.peerConnFactory.videoTrack(withID: "vedio", source:videoSource)
                 localStream!.addVideoTrack(videoTrack)
             }
 
             let frame = view.frame
             if (localView == nil) {
-                localView = RTCEAGLVideoView(frame:CGRectMake(0, 0, frame.width, frame.height/2))
+                localView = RTCEAGLVideoView(frame:CGRect(x: 0, y: 0, width: frame.width, height: frame.height/2))
             }
             if (remoteView == nil) {
-                remoteView = RTCEAGLVideoView(frame:CGRectMake(0, frame.height/2, frame.width, frame.height/2))
+                remoteView = RTCEAGLVideoView(frame:CGRect(x: 0, y: frame.height/2, width: frame.width, height: frame.height/2))
             }
 
-            localStream!.videoTracks[0].addRenderer(localView)
+            (localStream!.videoTracks[0] as AnyObject).add(localView)
             view.addSubview(localView!)
             view.addSubview(remoteView!)
         }
 
-        peerConnection.addStream(localStream)
+        peerConnection?.add(localStream)
         NSLog("Create Peer Connection and add mediastream")
 
         if (withOffer) {
             NSLog("Start to Create Offer...")
-            peerConnection.createOfferWithDelegate(self, constraints: constraints)
+            peerConnection?.createOffer(with: self, constraints: constraints)
         }
     }
 
-    func onChannelChanged(channel: Channel, status: String) {
+    func onChannelChanged(_ channel: Channel, status: String) {
         NSLog("onChannelChanged: \(status)")
 
         // FIXME. channel status should be simple.
         switch (status) {
             case "created":
                 channels[channel.peer.displayName] = channel
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     NSLog("outbound channel. create session with offer")
                     self.createSession(channel.peer.displayName, withOffer: true)
                 })
@@ -227,7 +229,7 @@ extension ViewController: SignalingServiceDelegate {
 
             case "received":
                 channels[channel.peer.displayName] = channel
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     NSLog("inbound channel, create session, will create answer when receive remote offer")
                     self.createSession(channel.peer.displayName, withOffer: false)
                 })
@@ -238,7 +240,7 @@ extension ViewController: SignalingServiceDelegate {
         }
     }
 
-    func onDataReceived(channel: Channel, data: String) {
+    func onDataReceived(_ channel: Channel, data: String) {
         NSLog("onDataReceived: \(data)")
 
         // FIXME. message type should be part of data.
@@ -246,31 +248,31 @@ extension ViewController: SignalingServiceDelegate {
             case "received":
                 NSLog("first message, should be session offer")
                 channel.status = "established"
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     NSLog("add remote sdp as offer")
-                    self.pcs[channel.peer.displayName]?.setRemoteDescriptionWithDelegate(self, sessionDescription: RTCSessionDescription(type: "offer", sdp: data))
+                    self.pcs[channel.peer.displayName]?.setRemoteDescriptionWith(self, sessionDescription: RTCSessionDescription(type: "offer", sdp: data))
                 })
                 break;
 
             case "created":
                 NSLog("first message for sender, should be session answer")
                 channel.status = "established"
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     NSLog("add remote sdp as answer")
-                    self.pcs[channel.peer.displayName]?.setRemoteDescriptionWithDelegate(self, sessionDescription: RTCSessionDescription(type: "answer", sdp: data))
+                    self.pcs[channel.peer.displayName]?.setRemoteDescriptionWith(self, sessionDescription: RTCSessionDescription(type: "answer", sdp: data))
                 })
                 break;
 
             default:
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     if let s = self.pcs[channel.peer.displayName] {
                         NSLog("received condidate for \(s)")
-                        var parts = data.componentsSeparatedByString(":")
+                        var parts = data.components(separatedBy: ":")
                         if parts.count == 4 {
                             NSLog("spdMid: \(parts[0])")
                             NSLog("sdpMLineIndex: \(parts[1])")
                             NSLog("sdp: \(parts[2]):\(parts[3])")
-                            s.addICECandidate(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
+                            s.add(RTCICECandidate(mid: parts[0], index: Int(parts[1])! , sdp: parts[2] + ":" + parts[3]))
                         } else {
                             NSLog("Can't convert message to candidate!!")
                         }
@@ -286,7 +288,7 @@ extension ViewController: SignalingServiceDelegate {
 
 extension ViewController: DiscoveryServiceDelegate {
 
-    func onPeerChanged(peers: [String]) {
+    func onPeerChanged(_ peers: [String]) {
         NSLog("onPeerChanged: \(peers)")
         self.peers = peers
         self.discovery.text = "Dsicovery: \(peers)"
